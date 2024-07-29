@@ -1,0 +1,119 @@
+openapi: 3.0.1
+info:
+  title: Library System API
+  version: v1
+  description: API documentation for the Library System
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+servers:
+  - url: 'http://localhost:3000'
+    description: Local server
+paths:
+  /api/v1/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Registers a new user in the system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "exampleUser"
+                password:
+                  type: string
+                  example: "password123"
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+              required:
+                - username
+                - password
+                - email
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User created successfully"
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example: ["Username can't be blank", "Password can't be blank", "Email can't be blank"]
+
+  /api/v1/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticates a user and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "password123"
+      responses:
+        '200':
+          description: "Login successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: "JWT token"
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: "User ID"
+                      username:
+                        type: string
+                        description: "Username"
+                      email:
+                        type: string
+                        description: "Email address"
+        '401':
+          description: "Invalid credentials"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid credentials"
