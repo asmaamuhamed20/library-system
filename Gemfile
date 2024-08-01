@@ -42,6 +42,7 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'rswag'
 gem 'rswag-ui'
 gem 'rswag-api'
+gem 'yard'
 
 
 group :development, :test do

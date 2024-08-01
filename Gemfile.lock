@@ -243,6 +243,7 @@ GEM
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    yard (0.9.36)
     zeitwerk (2.6.16)
 
 PLATFORMS
@@ -268,6 +269,7 @@ DEPENDENCIES
   sqlite3 (~> 1.4)
   swagger-docs
   tzinfo-data
+  yard
 
 RUBY VERSION
    ruby 3.2.2p53

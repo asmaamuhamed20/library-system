@@ -7,7 +7,12 @@ Rails.application.routes.draw do
       post 'register', to: 'authentication#register'
       post 'login', to: 'authentication#login'
 
+
+      # Users
       resources :users
+
+      # Categories
+      resources :categories
     end
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
