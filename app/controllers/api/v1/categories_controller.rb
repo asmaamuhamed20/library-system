@@ -2,7 +2,7 @@ class Api::V1::CategoriesController < ApplicationController
   before_action :set_category, only: [:show, :update, :destroy]
   before_action :authorize_admin, only: %i[index create update destroy show]
 
-   # Retrieves a list of all categories.
+  # Retrieves a list of all categories.
   #
   # @return [Array<Category>] The list of categories.
   # @example Request
@@ -22,7 +22,7 @@ class Api::V1::CategoriesController < ApplicationController
     render json: @category
   end
 
- # Creates a new category.
+  # Creates a new category.
   #
   # @param category_params [Hash] The parameters for creating a new category.
   # @option category_params [String] :name The name of the category.
