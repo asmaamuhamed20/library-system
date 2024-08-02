@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_27_152149) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_02_113433) do
   create_table "books", force: :cascade do |t|
     t.string "title"
     t.string "author"
@@ -73,7 +73,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_27_152149) do
   add_foreign_key "borrowings", "books"
   add_foreign_key "borrowings", "users"
   add_foreign_key "categorizations", "books"
+  add_foreign_key "categorizations", "books"
+  add_foreign_key "categorizations", "books", on_delete: :cascade
   add_foreign_key "categorizations", "categories"
+  add_foreign_key "categorizations", "categories"
+  add_foreign_key "categorizations", "categories", on_delete: :cascade
   add_foreign_key "reviews", "books"
   add_foreign_key "reviews", "users"
 end

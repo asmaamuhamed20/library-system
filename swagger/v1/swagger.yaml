@@ -79,11 +79,11 @@ paths:
               properties:
                 email:
                   type: string
-                  example: "user@example.com"
+                  example: "asmaa@gmail.com"
                 password:
                   type: string
                   format: password
-                  example: "password123"
+                  example: "1234567890"
       responses:
         '200':
           description: "Login successful"
@@ -531,3 +531,180 @@ paths:
                   error:
                     type: string
                     example: "Unauthorized"
+  /api/v1/books:
+    get:
+      summary: Retrieve all books
+      tags:
+        - Books
+      security:
+        - JWTAuth: []
+      responses:
+        '200':
+          description: A list of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: The ID of the book
+                    title:
+                      type: string
+                      description: The title of the book
+                    author:
+                      type: string
+                      description: The author of the book
+                    isbn:
+                      type: string
+                      description: The ISBN of the book
+                    published_date:
+                      type: string
+                      format: date
+                      description: The published date of the book
+                  required:
+                    - title
+                    - author
+                    - isbn
+                    - published_date
+     post:
+      summary: Create a new book
+      operationId: createBook
+      tags:
+        - Books
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                book:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    author:
+                      type: string
+                    isbn:
+                      type: string
+                    published_date:
+                      type: string
+                      format: date
+                    description:
+                      type: string
+                    category_ids:
+                      type: array
+                      items:
+                        type: integer
+      responses:
+        '201':
+          description: "Book created successfully"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  author:
+                    type: string
+                  isbn:
+                    type: string
+                  published_date:
+                    type: string
+                    format: date
+                  description:
+                    type: string
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+        '422':
+          description: "Unprocessable Entity"
+    patch:
+      summary: Update a book by ID
+      tags:
+        - Books
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: The title of the book
+                author:
+                  type: string
+                  description: The author of the book
+                isbn:
+                  type: string
+                  description: The ISBN of the book
+                published_date:
+                  type: string
+                  format: date
+                  description: The published date of the book
+              required:
+                - title
+                - author
+                - isbn
+                - published_date
+      responses:
+        '200':
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The ID of the book
+                  title:
+                    type: string
+                    description: The title of the book
+                  author:
+                    type: string
+                    description: The author of the book
+                  isbn:
+                    type: string
+                    description: The ISBN of the book
+                  published_date:
+                    type: string
+                    format: date
+                    description: The published date of the book
+                required:
+                  - title
+                  - author
+                  - isbn
+                  - published_date
+        '404':
+          description: Book not found
+        '422':
+          description: Invalid request
+    delete:
+      summary: Delete a book by ID
+      tags:
+        - Books
+      security:
+        - JWTAuth: []
+      responses:
+        '204':
+          description: Book deleted successfully
+        '404':
+          description: Book not found

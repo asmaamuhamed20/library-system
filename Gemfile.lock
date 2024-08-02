@@ -150,7 +150,7 @@ GEM
       nio4r (~> 2.0)
     pundit (2.3.2)
       activesupport (>= 3.0.0)
-    racc (1.8.0)
+    racc (1.8.1)
     rack (3.1.7)
     rack-session (2.0.0)
       rack (>= 3.0.0)
@@ -244,7 +244,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yard (0.9.36)
-    zeitwerk (2.6.16)
+    zeitwerk (2.6.17)
 
 PLATFORMS
   x64-mingw-ucrt
@@ -264,7 +264,7 @@ DEPENDENCIES
   rspec-rails
   rswag
   rswag-api
-  rswag-ui
+  rswag-ui (~> 2.13.0)
   shoulda-matchers
   sqlite3 (~> 1.4)
   swagger-docs

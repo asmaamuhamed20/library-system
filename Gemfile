@@ -40,7 +40,7 @@ gem 'pundit'
 gem 'swagger-docs'
 gem 'bcrypt', '~> 3.1.7'
 gem 'rswag'
-gem 'rswag-ui'
+gem 'rswag-ui', '~> 2.13.0'
 gem 'rswag-api'
 gem 'yard'
 
