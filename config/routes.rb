@@ -16,6 +16,9 @@ Rails.application.routes.draw do
 
       # Books
       resources :books
+
+      # Borrowings
+      resources :borrowings
     end
   end
 
