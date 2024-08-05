@@ -603,100 +603,52 @@ paths:
                         type: integer
       responses:
         '201':
-          description: "Book created successfully"
+          description: The created book
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  title:
-                    type: string
-                  author:
-                    type: string
-                  isbn:
-                    type: string
-                  published_date:
-                    type: string
-                    format: date
-                  description:
-                    type: string
-                  categories:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                        name:
-                          type: string
+                $ref: '#/components/schemas/Book'
         '422':
-          description: "Unprocessable Entity"
-    patch:
-      summary: Update a book by ID
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+   patch:
+      summary: Update specific attributes of a book
       tags:
         - Books
-      security:
-        - JWTAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  description: The title of the book
-                author:
-                  type: string
-                  description: The author of the book
-                isbn:
-                  type: string
-                  description: The ISBN of the book
-                published_date:
-                  type: string
-                  format: date
-                  description: The published date of the book
-              required:
-                - title
-                - author
-                - isbn
-                - published_date
+              $ref: '#/components/schemas/UpdateBook'
       responses:
         '200':
-          description: Book updated successfully
+          description: The updated book
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    description: The ID of the book
-                  title:
-                    type: string
-                    description: The title of the book
-                  author:
-                    type: string
-                    description: The author of the book
-                  isbn:
-                    type: string
-                    description: The ISBN of the book
-                  published_date:
-                    type: string
-                    format: date
-                    description: The published date of the book
-                required:
-                  - title
-                  - author
-                  - isbn
-                  - published_date
+                $ref: '#/components/schemas/Book'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
         '404':
           description: Book not found
-        '422':
-          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
     delete:
       summary: Delete a book by ID
       tags:

@@ -12,9 +12,8 @@ class Api::V1::BooksController < ApplicationController
   end
 
   def create
-    @book = Book.new(book_params)
-    if @book.save
-      assign_categories(@book, params[:category_ids])
+    @book = Book.create_with_categories(book_params, params[:categories])
+    if @book.persisted?
       render json: @book, status: :created, include: :categories
     else
       render json: @book.errors, status: :unprocessable_entity
@@ -22,11 +21,11 @@ class Api::V1::BooksController < ApplicationController
   end
 
   def update
-    if @book.update(book_params)
-      assign_categories(@book, params.dig(:book, :category_ids))
-      render json: @book, status: :ok, include: :categories
+    result = @book.update_with_categories(book_params, params[:book][:category_ids])
+    if result[:status] == :ok
+      render json: result[:book], status: :ok, include: :categories
     else
-      render json: @book.errors, status: :unprocessable_entity
+      render json: { errors: result[:errors] }, status: result[:status]
     end
   end
 
@@ -50,13 +49,6 @@ class Api::V1::BooksController < ApplicationController
     params.require(:book).permit(:title, :author, :isbn, :description, :published_date, category_ids: [])
   end
 
-  def assign_categories(book, category_ids)
-    if category_ids.present?
-      categories = Category.where(id: category_ids)
-      book.categories = categories
-      book.save
-    end
-  end
   
   def authorize_admin
     render_error(:unauthorized, 'Not authorized') unless current_user&.admin?
