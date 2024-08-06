@@ -2,6 +2,6 @@
 module AuthHelper
   def authenticate_user(user)
     token = JsonWebToken.encode(user_id: user.id)
-    request.headers['Authorization'] = "Bearer #{token}" 
+    { 'Authorization' => "Bearer #{token}" }
   end
 end

@@ -1,18 +1,23 @@
 class Api::V1::BorrowingsController < ApplicationController
+  before_action :set_borrowing, only: [:update, :destroy]
+  before_action :authorize_member, only: [:create]
+  before_action :authorize_admin, only: [:update, :destroy]
+
   def create
-    @borrowing = Borrowing.new(borrowing_params)
-    if @borrowing.save
-      render json: @borrowing, status: :created
+    result = Borrowing.create_with_params(borrowing_params)
+    if result[:status] == :created
+      render json: result[:borrowing], status: :created
     else
-      render json: @borrowing.errors, status: :unprocessable_entity
+      render json: result[:errors], status: :unprocessable_entity
     end
   end
 
   def update
-    if @borrowing.update(borrowing_params)
-      render json: @borrowing, status: :ok
+    result = @borrowing.update_with_params(borrowing_params)
+    if result[:status] == :ok
+      render json: result[:borrowing], status: :ok
     else
-      render json: @borrowing.errors, status: :unprocessable_entity
+      render json: result[:errors], status: :unprocessable_entity
     end
   end
 
@@ -33,7 +38,7 @@ class Api::V1::BorrowingsController < ApplicationController
   end
 
   def borrowing_params
-    params.require(:borrowing).permit(:user_id, :book_id, :borrowed_on, :due_date, :returned_on)
+    params.require(:borrowing).permit(:user_id, :book_id, :borrowed_at, :due_date, :returned_at)
   end
 
   def authorize_member

@@ -69,12 +69,9 @@ components:
         due_date:
           type: string
           format: date
-        return_date:
+        returned_at:
           type: string
           format: date
-        status:
-          type: string
-          enum: [borrowed, returned, overdue]
     Error:
       type: object
       properties:
@@ -748,34 +745,10 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/v1/borrowings:
-    get:
-      tags:
-        - Borrowings
-      summary: List all borrowings
-      description: Retrieve a list of all borrowings.
-      security:
-        - JWTAuth: []
-      responses:
-        '200':
-          description: A list of borrowings
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Borrowing'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
     post:
       tags:
         - Borrowings
-      summary: Create a new borrowing entry
-      description: Create a new borrowing record.
+      summary: Create a new borrowing
       security:
         - JWTAuth: []
       requestBody:
@@ -785,75 +758,40 @@ paths:
             schema:
               type: object
               properties:
-                book_id:
-                  type: integer
-                  example: 1
                 user_id:
                   type: integer
-                  example: 1
-                borrow_date:
+                book_id:
+                  type: integer
+                borrowed_at:
                   type: string
                   format: date
-                  example: "2024-08-01"
-                due_date:
+                due_at:
                   type: string
                   format: date
-                  example: "2024-08-15"
+                returned_at:
+                  type: string
+                  format: date
       responses:
         '201':
-          description: Borrowing record created successfully
+          description: Borrowing created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Borrowing'
-        '422':
-          description: Unprocessable Entity - Validation errors
+        '401':
+          description: Unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized access
+        '422':
+          description: Unprocessable Entity
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 
   /api/v1/borrowings/{id}:
-    get:
-      tags:
-        - Borrowings
-      summary: Retrieve a borrowing record by ID
-      description: Retrieve a specific borrowing record by its ID.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: ID of the borrowing record to retrieve
-          schema:
-            type: integer
-      security:
-        - JWTAuth: []
-      responses:
-        '200':
-          description: Details of the specified borrowing record
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Borrowing'
-        '404':
-          description: Borrowing record not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
     patch:
       tags:
         - Borrowings
@@ -875,7 +813,7 @@ paths:
             schema:
               type: object
               properties:
-                return_date:
+                returned_at:
                   type: string
                   format: date
                   example: "2024-08-10"
@@ -1014,13 +952,13 @@ components:
           type: integer
         user_id:
           type: integer
-        borrow_date:
+        borrowed_at:
           type: string
           format: date
         due_date:
           type: string
           format: date
-        return_date:
+        returned_at:
           type: string
           format: date
         created_at:
