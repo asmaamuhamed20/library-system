@@ -37,9 +37,8 @@ class Api::V1::BooksController < ApplicationController
   # @example Response
   #   HTTP Status: 201 Created
   def create
-    @book = Book.new(book_params)
-    if @book.save
-      assign_categories(@book, params[:category_ids])
+    @book = Book.create_with_categories(book_params, params[:categories])
+    if @book.persisted?
       render json: @book, status: :created, include: :categories
     else
       render json: @book.errors, status: :unprocessable_entity
@@ -62,11 +61,11 @@ class Api::V1::BooksController < ApplicationController
   # @example Response
   #   HTTP Status: 200 OK
   def update
-    if @book.update(book_params)
-      assign_categories(@book, params.dig(:book, :category_ids))
-      render json: @book, status: :ok, include: :categories
+    result = @book.update_with_categories(book_params, params[:book][:category_ids])
+    if result[:status] == :ok
+      render json: result[:book], status: :ok, include: :categories
     else
-      render json: @book.errors, status: :unprocessable_entity
+      render json: { errors: result[:errors] }, status: result[:status]
     end
   end
 
