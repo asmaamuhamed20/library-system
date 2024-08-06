@@ -8,6 +8,7 @@ class Book < ApplicationRecord
   # Associations
   has_many :categorizations, dependent: :destroy
   has_many :categories, through: :categorizations
+  has_many :borrowings
 
   def self.create_with_categories(book_params, category_ids)
     book = new(book_params)
