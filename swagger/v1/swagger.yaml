@@ -773,6 +773,7 @@ paths:
                   format: date
       responses:
         '201':
+
           description: Borrowing created
           content:
             application/json:
@@ -799,11 +800,27 @@ paths:
       description: Updates details of a specific borrowing record.
       security:
         - JWTAuth: []
+          description: The created book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+   patch:
+      summary: Update specific attributes of a book
+      tags:
+        - Books
+
       parameters:
         - name: id
           in: path
           required: true
-          description: ID of the borrowing record to update
+
           schema:
             type: integer
       requestBody:
