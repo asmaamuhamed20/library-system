@@ -104,17 +104,7 @@ class Api::V1::BooksController < ApplicationController
     params.require(:book).permit(:title, :author, :isbn, :description, :published_date, category_ids: [])
   end
 
-  # Assigns categories to the book based on provided category IDs.
-  #
-  # @param book [Book] The book to assign categories to.
-  # @param category_ids [Array<Integer>] An array of category IDs.
-  def assign_categories(book, category_ids)
-    if category_ids.present?
-      categories = Category.where(id: category_ids)
-      book.categories = categories
-      book.save
-    end
-  end
+
   
   # Authorizes that the current user is an admin.
   #
