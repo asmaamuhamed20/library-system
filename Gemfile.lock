@@ -265,7 +265,7 @@ DEPENDENCIES
   rswag
   rswag-api
   rswag-ui (~> 2.13.0)
-  shoulda-matchers
+  shoulda-matchers (~> 6.2)
   sqlite3 (~> 1.4)
   swagger-docs
   tzinfo-data
