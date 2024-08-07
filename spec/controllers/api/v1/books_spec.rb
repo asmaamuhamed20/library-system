@@ -3,82 +3,94 @@ require 'rails_helper'
 RSpec.describe Api::V1::BooksController, type: :controller do
   include AuthHelper
 
-  let!(:admin) { create(:user, :admin) }
-  let!(:book) { create(:book) }
+  let(:admin_user) { create(:user, :admin) }
+  let(:regular_user) { create(:user) }
+  let(:book) { create(:book) }
+  let(:valid_attributes) { attributes_for(:book) }
+  let(:invalid_attributes) { { title: '' } }
 
-  before { authenticate_user(admin) }
+  before do
+    request.headers.merge!(authenticate_user(admin_user))
+  end
 
-  describe 'GET /books' do
+  describe 'GET #index' do
     it 'returns a success response' do
       get :index
-      expect(response).to have_http_status(:success)
+      expect(response).to be_successful
     end
   end
 
-  describe 'GET /books/:id' do
-    context 'when the book exists' do
-      it 'returns a success response' do
-        get :show, params: { id: book.id }
-        expect(response).to have_http_status(:success)
-      end
-    end
-
-    context 'when the book does not exist' do
-      it 'returns a not found response' do
-        get :show, params: { id: 999 }
-        expect(response).to have_http_status(:not_found)
-      end
+  describe 'GET #show' do
+    it 'returns a success response' do
+      get :show, params: { id: book.to_param }
+      expect(response).to be_successful
     end
   end
 
-  describe 'POST /books' do
-    context 'when the request is valid' do
-      let(:valid_attributes) { attributes_for(:book) }
+  describe 'POST #create' do
+    context 'with valid parameters' do
+      it 'creates a new Book' do
+        expect {
+          post :create, params: { book: valid_attributes }
+        }.to change(Book, :count).by(1)
+      end
 
-      it 'creates a new book' do
+      it 'renders a JSON response with the new book' do
         post :create, params: { book: valid_attributes }
         expect(response).to have_http_status(:created)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(response.body).to match(/#{Book.last.title}/)
       end
     end
 
-    context 'when the request is invalid' do
-      let(:invalid_attributes) { { title: nil } }
-
-      it 'returns an unprocessable entity response' do
+    context 'with invalid parameters' do
+      it 'renders a JSON response with errors for the new book' do
         post :create, params: { book: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(response.body).to match(/can't be blank/)
       end
     end
   end
 
-  describe 'PUT /books/:id' do
-    context 'when the record exists' do
-      let(:valid_attributes) { { title: 'Updated Title' } }
+  describe 'PATCH #update' do
+    context 'with valid parameters' do
+      let(:new_attributes) { { title: 'Updated Title' } }
 
-      it 'updates the record' do
-        put :update, params: { id: book.id, book: valid_attributes }
+      it 'updates the requested book' do
+        patch :update, params: { id: book.to_param, book: new_attributes }
         book.reload
         expect(book.title).to eq('Updated Title')
+      end
+
+      it 'renders a JSON response with the book' do
+        patch :update, params: { id: book.to_param, book: new_attributes }
         expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(response.body).to match(/Updated Title/)
       end
     end
 
-    context 'when the request is invalid' do
-      let(:invalid_attributes) { { title: nil } }
-
-      it 'returns an unprocessable entity response' do
-        put :update, params: { id: book.id, book: invalid_attributes }
+    context 'with invalid parameters' do
+      it 'renders a JSON response with errors for the book' do
+        patch :update, params: { id: book.to_param, book: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(response.body).to match(/can't be blank/)
       end
     end
   end
 
-  describe 'DELETE /books/:id' do
-    it 'returns a no content response' do
+  describe 'DELETE #destroy' do
+    it 'destroys the requested book' do
+      book_to_delete = create(:book)
       expect {
-        delete :destroy, params: { id: book.id }
+        delete :destroy, params: { id: book_to_delete.to_param }
       }.to change(Book, :count).by(-1)
+    end
 
+    it 'renders a JSON response with no content' do
+      delete :destroy, params: { id: book.to_param }
       expect(response).to have_http_status(:no_content)
     end
   end
