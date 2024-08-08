@@ -8,7 +8,9 @@ RSpec.describe Api::V1::CategoriesController, type: :controller do
   let(:valid_attributes) { { name: 'Science Fiction' } }
   let(:invalid_attributes) { { name: '' } }
 
-  before { authenticate_user(admin) }
+  before do
+    request.headers.merge!(authenticate_user(admin))
+  end
 
   describe "GET #index" do
     it "returns a success response" do

@@ -5,8 +5,11 @@ RSpec.describe Api::V1::BooksController, type: :controller do
 
   let!(:admin) { create(:user, :admin) }
   let!(:book) { create(:book) }
+  let(:auth_headers) { authenticate_user(admin) }
 
-  before { authenticate_user(admin) }
+  before do
+    request.headers.merge!(auth_headers)
+  end
 
   describe 'GET /books' do
     it 'returns a success response' do

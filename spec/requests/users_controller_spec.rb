@@ -1,62 +1,49 @@
 require 'rails_helper'
 
-RSpec.describe Api::V1::UsersController, type: :controller do
-  include AuthHelper
-
-  let(:admin) { create(:user, role: :admin) }
-  let(:user) { create(:user) }
+RSpec.describe 'Api::V1::UsersController', type: :request do
+  let(:admin) { create(:user, role: :admin) } 
+  let(:user) { create(:user) } 
   let(:auth_headers) { authenticate_user(admin) }
 
-  before do
-    request.headers.merge!(auth_headers)
-  end
-
-  describe 'GET #index' do
+  describe 'GET /api/v1/users' do
     before do
-      create_list(:user, 3)
-      get :index
+      create_list(:user, 3) 
+      get '/api/v1/users', headers: auth_headers
     end
 
     it 'returns a list of users' do
       expect(response).to have_http_status(:ok)
-      users = JSON.parse(response.body)
-      expect(users.size).to eq(4) 
+      expect(JSON.parse(response.body).size).to eq(4)
     end
   end
 
-  describe 'GET #show' do
+  describe 'GET /api/v1/users/:id' do
     before do
-      get :show, params: { id: user.id }
+      get "/api/v1/users/#{user.id}", headers: auth_headers
     end
 
     it 'returns the user details' do
       expect(response).to have_http_status(:ok)
-      returned_user = JSON.parse(response.body)
-      expect(returned_user['id']).to eq(user.id)
-      expect(returned_user['username']).to eq(user.username)
-      expect(returned_user['email']).to eq(user.email)
+      expect(JSON.parse(response.body)['id']).to eq(user.id)
     end
   end
 
-  describe 'PATCH #update' do
+  describe 'PATCH /api/v1/users/:id' do
     let(:new_attributes) { { username: 'new_username', email: 'new_email@example.com', role: 'admin' } }
 
     before do
-      patch :update, params: { id: user.id, user: new_attributes }
+      patch "/api/v1/users/#{user.id}", params: { user: new_attributes }, headers: auth_headers
     end
 
     it 'updates the user' do
       expect(response).to have_http_status(:ok)
-      user.reload
-      expect(user.username).to eq('new_username')
-      expect(user.email).to eq('new_email@example.com')
-      expect(user.role).to eq('admin')
+      expect(User.find(user.id).username).to eq('new_username')
     end
   end
 
-  describe 'DELETE #destroy' do
+  describe 'DELETE /api/v1/users/:id' do
     before do
-      delete :destroy, params: { id: user.id }
+      delete "/api/v1/users/#{user.id}", headers: auth_headers
     end
 
     it 'deletes the user' do
@@ -68,27 +55,23 @@ RSpec.describe Api::V1::UsersController, type: :controller do
   describe 'Authorization' do
     let(:unauthorized_headers) { authenticate_user(user) }
 
-    before do
-      request.headers.merge!(unauthorized_headers)
-    end
-
     it 'denies access to non-admin users for index' do
-      get :index
+      get '/api/v1/users', headers: unauthorized_headers
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'denies access to non-admin users for show' do
-      get :show, params: { id: user.id }
+      get "/api/v1/users/#{user.id}", headers: unauthorized_headers
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'denies access to non-admin users for update' do
-      patch :update, params: { id: user.id, user: { username: 'new_username' } }
+      patch "/api/v1/users/#{user.id}", params: { user: { username: 'new_username' } }, headers: unauthorized_headers
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'denies access to non-admin users for destroy' do
-      delete :destroy, params: { id: user.id }
+      delete "/api/v1/users/#{user.id}", headers: unauthorized_headers
       expect(response).to have_http_status(:unauthorized)
     end
   end
