@@ -26,25 +26,17 @@ RSpec.describe "Borrowings API", type: :request do
   describe 'POST /api/v1/borrowings' do
     context 'with invalid parameters' do
       before do
-        create(:borrowing, user: user, book: book, borrowed_at: Time.current, due_date: 1.week.from_now, returned_at: Time.current)
+        create(:borrowing, user: user, book: book, borrowed_at: Time.current, due_date: 1.week.from_now, returned_at: nil)
       end
-  
-      let(:invalid_attributes) do
-        {
-          user_id: user.id,
-          book_id: book.id,
-          borrowed_at: Time.current,
-          due_date: 1.week.from_now
-        }
-      end
-  
+
       it 'does not create a new Borrowing if the book is already borrowed' do
-        expect {
-          post api_v1_borrowings_path, params: { borrowing: invalid_attributes }, headers: authenticate_user(user)
-        }.not_to change(Borrowing, :count)
+        post api_v1_borrowings_path, params: { borrowing: valid_attributes }, headers: authenticate_user(user)
+        
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.body).to include("is already borrowed")
       end
     end
-  end  
+  end
 
   describe "PATCH /api/v1/borrowings/:id" do
     let!(:borrowing) { create(:borrowing, user: user, book: book, borrowed_at: Time.current, due_date: 1.week.from_now) }

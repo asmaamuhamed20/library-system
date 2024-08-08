@@ -46,6 +46,10 @@ class Api::V1::BorrowingsController < ApplicationController
   end
 
   def authorize_admin
-    render_error(:unauthorized, 'Not authorized') unless current_user&.admin?
+    render_error('Not authorized', :unauthorized) unless current_user&.admin?
+  end
+
+  def render_error(message, status)
+    render json: { error: message }, status: status
   end
 end

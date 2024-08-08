@@ -765,7 +765,7 @@ paths:
                 borrowed_at:
                   type: string
                   format: date
-                due_at:
+                due_date:
                   type: string
                   format: date
                 returned_at:

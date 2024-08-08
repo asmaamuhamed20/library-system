@@ -2,10 +2,9 @@ class Borrowing < ApplicationRecord
   belongs_to :user
   belongs_to :book
 
-  validates :user_id, :book_id, :borrowed_at, :due_date, :returned_at, presence: true
-
-
-  validate :book_available
+  validates :user_id, :book_id, :borrowed_at, :due_date,  presence: true
+  validates :returned_at, presence: true, on: :update
+  validate :book_available, on: :create
 
   def self.create_with_params(params)
     borrowing = new(params)
@@ -27,6 +26,8 @@ class Borrowing < ApplicationRecord
   private
 
   def book_available
-    !Borrowing.where(book_id: book_id).where(returned_at: nil).exists?
+    if Borrowing.where(book_id: book_id, returned_at: nil).exists?
+      errors.add(:book_id, 'is already borrowed')
+    end
   end
 end
