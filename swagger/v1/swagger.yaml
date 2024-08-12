@@ -1,17 +1,61 @@
 openapi: 3.0.1
 info:
   title: Library System API
-  version: v1
-  description: API documentation for the Library System
+  description: API documentation for the Library System.
+  version: 1.0.0
 components:
   securitySchemes:
     JWTAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-servers:
-  - url: 'http://localhost:3000'
-    description: Local server
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        published_date:
+          type: string
+          format: date
+        description:
+          type: string
+        category_ids:
+          type: array
+          items:
+            type: integer
+    UpdateBook:
+      type: object
+      properties:
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        published_date:
+          type: string
+          format: date
+        description:
+          type: string
+        category_ids:
+          type: array
+          items:
+            type: integer
+    Errors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+
 paths:
   /api/v1/register:
     post:
@@ -56,13 +100,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: string
-                    example: ["Username can't be blank", "Password can't be blank", "Email can't be blank"]
+                $ref: '#/components/schemas/Errors'
 
   /api/v1/login:
     post:
@@ -117,6 +155,7 @@ paths:
                   error:
                     type: string
                     example: "Invalid credentials"
+                    
   /api/v1/users:
     get:
       tags:
@@ -296,7 +335,6 @@ paths:
           description: Unauthorized access
         '403':
           description: Forbidden access
-          
 
   /api/v1/categories:
     get:
@@ -368,13 +406,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: string
-                    example: ["Name can't be blank"]
+                $ref: '#/components/schemas/Errors'
 
   /api/v1/categories/{id}:
     get:
@@ -416,14 +448,6 @@ paths:
                     example: "Category not found"
         '401':
           description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
 
     patch:
       summary: Update a category by ID
@@ -447,7 +471,7 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "Updated Category Name"
+                  example: "Science Fiction"
       responses:
         '200':
           description: Category updated
@@ -461,7 +485,7 @@ paths:
                     example: 1
                   name:
                     type: string
-                    example: "Updated Category Name"
+                    example: "Science Fiction"
         '404':
           description: Category not found
           content:
@@ -477,23 +501,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: string
-                    example: ["Name can't be blank"]
+                $ref: '#/components/schemas/Errors'
         '401':
           description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
 
     delete:
       summary: Delete a category by ID
@@ -510,7 +520,7 @@ paths:
           description: ID of the category
       responses:
         '204':
-          description: No content, category deleted successfully
+          description: Category deleted
         '404':
           description: Category not found
           content:
@@ -523,55 +533,44 @@ paths:
                     example: "Category not found"
         '401':
           description: Unauthorized access
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
+
   /api/v1/books:
     get:
-      summary: Retrieve all books
+      summary: Get all books
       tags:
         - Books
       security:
         - JWTAuth: []
+      parameters:
+        - in: query
+          name: title
+          schema:
+            type: string
+          description: Filter by book title
+        - in: query
+          name: author
+          schema:
+            type: string
+          description: Filter by author
+        - in: query
+          name: category_id
+          schema:
+            type: integer
+          description: Filter by category ID
       responses:
         '200':
-          description: A list of books
+          description: List of books
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      description: The ID of the book
-                    title:
-                      type: string
-                      description: The title of the book
-                    author:
-                      type: string
-                      description: The author of the book
-                    isbn:
-                      type: string
-                      description: The ISBN of the book
-                    published_date:
-                      type: string
-                      format: date
-                      description: The published date of the book
-                  required:
-                    - title
-                    - author
-                    - isbn
-                    - published_date
-     post:
+                  $ref: '#/components/schemas/Book'
+        '401':
+          description: Unauthorized access
+
+    post:
       summary: Create a new book
-      operationId: createBook
       tags:
         - Books
       security:
@@ -581,43 +580,345 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                book:
-                  type: object
-                  properties:
-                    title:
-                      type: string
-                    author:
-                      type: string
-                    isbn:
-                      type: string
-                    published_date:
-                      type: string
-                      format: date
-                    description:
-                      type: string
-                    category_ids:
-                      type: array
-                      items:
-                        type: integer
+              $ref: '#/components/schemas/Book'
       responses:
         '201':
-          description: The created book
+          description: Book created successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Book'
+        '422':
+          description: Unprocessable Entity - Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+
+  /api/v1/books/{id}:
+    get:
+      summary: Get a book by ID
+      tags:
+        - Books
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the book
+      responses:
+        '200':
+          description: Book details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Book not found"
+        '401':
+          description: Unauthorized access
+
+    patch:
+      summary: Update a book by ID
+      tags:
+        - Books
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBook'
+      responses:
+        '200':
+          description: Book updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Book not found"
+        '422':
+          description: Unprocessable Entity - Validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+        '401':
+          description: Unauthorized access
+
+    delete:
+      summary: Delete a book by ID
+      tags:
+        - Books
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the book
+      responses:
+        '204':
+          description: Book deleted successfully
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Book not found"
+        '401':
+          description: Unauthorized access
+
+  /api/v1/borrowings:
+    post:
+      tags:
+        - Borrowings
+      summary: Create a new borrowing
+      security:
+        - JWTAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                book_id:
+                  type: integer
+                borrowed_at:
+                  type: string
+                  format: date
+                due_date:
+                  type: string
+                  format: date
+                returned_at:
+                  type: string
+                  format: date
+      responses:
+        '201':
+
+          description: Borrowing created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Borrowing'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/borrowings/{id}:
+    patch:
+      tags:
+        - Borrowings
+      summary: Update a borrowing record by ID
+      description: Updates details of a specific borrowing record.
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the borrowing record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                due_date:
+                  type: string
+                  format: date
+                  example: "2024-09-01"
+              required:
+                - due_date
+      responses:
+        '200':
+          description: Borrowing record updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Borrowing record updated successfully"
+        '404':
+          description: Borrowing record not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Borrowing record not found"
         '422':
           description: Validation errors
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Errors'
-   patch:
-      summary: Update specific attributes of a book
+        '401':
+          description: Unauthorized access
+
+    delete:
       tags:
-        - Books
+        - Borrowings
+      summary: Delete a borrowing record by ID
+      description: Deletes a specific borrowing record by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the borrowing record to delete
+          schema:
+            type: integer
+      security:
+        - JWTAuth: []
+      responses:
+        '204':
+          description: Borrowing record deleted successfully
+        '404':
+          description: Borrowing record not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden access
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/v1/reviews:
+    get:
+      tags:
+        - Reviews
+      summary: Get a list of all reviews
+      operationId: getReviews
+      responses:
+        '200':
+          description: A list of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+    post:
+      tags:
+        - Reviews
+      security:
+         - JWTAuth: []
+      summary: Create a new review
+      operationId: createReview
+      requestBody:
+        required: true
+        content:
+         application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewInput'  
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  api/v1/reviews/{id}:
+    get:
+      tags:
+        - Reviews
+      summary: Get a review by ID
+      operationId: getReviewById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Review details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags:
+        - Reviews
+      security:
+         - JWTAuth: []
+      summary: Update a review by ID
+      operationId: updateReview
       parameters:
         - name: id
           in: path
@@ -629,34 +930,185 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateBook'
+             $ref: '#/components/schemas/ReviewInput'
       responses:
         '200':
-          description: The updated book
+          description: Review updated successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Book'
-        '400':
-          description: Bad request
+                $ref: '#/components/schemas/Review'
+        '422':
+          description: Unprocessable Entity
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Errors'
-        '404':
-          description: Book not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Errors'
+                $ref: '#/components/schemas/Error'
+  
     delete:
-      summary: Delete a book by ID
       tags:
-        - Books
+        - Reviews
       security:
         - JWTAuth: []
+      summary: Delete a review by ID
+      operationId: deleteReview
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '204':
-          description: Book deleted successfully
-        '404':
-          description: Book not found
+          description: Review deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        username:
+          type: string
+        role:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        author:
+          type: string
+        isbn:
+          type: string
+        description:
+          type: string
+        published_date:
+          type: string
+          format: date
+        categories:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Borrowing:
+      type: object
+      properties:
+        id:
+          type: integer
+        book_id:
+          type: integer
+        user_id:
+          type: integer
+        borrowed_at:
+          type: string
+          format: date
+        due_date:
+          type: string
+          format: date
+        returned_at:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        book_id:
+          type: integer
+        rating:
+          type: integer
+          example: 4
+        comment:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ReviewInput:
+      type: object
+      required:
+        - book_id
+        - rating
+      properties:
+        book_id:
+          type: integer
+        rating:
+          type: integer
+          example: 4
+        comment:
+          type: string
+
+    Errors:
+      type: object
+      properties:
+        error:
+          type: string
+    Auth:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: integer
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        details:
+          type: string
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    

@@ -16,6 +16,10 @@ Rails.application.routes.draw do
 
       # Books
       resources :books
+
+      # Reviews
+      resources :reviews
+
     end
   end
 
