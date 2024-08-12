@@ -1,0 +1,75 @@
+The Library System is a backend application that allows users to manage books, borrow and return them, and leave reviews. It includes features like user authentication, book management, and a review system.
+
+## Cloning the Repository
+1. **Clone the Repository:**
+   git clone https://github.com/your-username/library-system.git
+
+    cd library-system
+    bundle install
+2.**Set Up the Database:**
+  rails db:create
+  rails db:migrate
+
+3.**Run the Rails server:**
+
+
+**How to Use the Application**
+**User Registration**
+Register a New User:
+Send a POST request to /api/v1/users with the following JSON body:
+{
+  "user": {
+    "email": "user@example.com",
+    "password": "password",
+    "password_confirmation": "password"
+  }
+}
+
+**Book Management**
+List All Books:
+Send a GET request to /api/v1/books.
+
+Create a New Book:
+Send a POST request to /api/v1/books with the book details in the JSON body.
+
+Update a Book:
+
+Send a PATCH request to /api/v1/books/:id with the updated book details.
+
+Delete a Book:
+
+Send a DELETE request to /api/v1/books/:id.
+
+**Borrowing and Returning Books**
+Borrow a Book:
+
+Send a POST request to /api/v1/borrowings with the book ID and user ID.
+
+
+Borrowing and Returning Books
+Borrow a Book:
+
+Send a POST request to /api/v1/borrowings with the book ID and user ID.
+
+
+**Reviews and Ratings**
+List All Reviews:
+
+Send a GET request to /api/v1/reviews.
+
+Create a Review:
+
+Send a POST request to /api/v1/reviews with the review details in the JSON body.
+
+Update a Review:
+
+Send a PATCH request to /api/v1/reviews/:id with the updated review details.
+
+Delete a Review:
+
+Send a DELETE request to /api/v1/reviews/:id.
+
+
+
+
+
