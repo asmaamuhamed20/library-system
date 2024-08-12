@@ -24,13 +24,13 @@ To clone this repository and run the application locally, follow these steps:
 The application will be available at http://localhost:3000.
 
 ## I used in this application
-rails: The Rails framework for building the application.
-jwt: For handling JSON Web Tokens (JWT) for authentication.
-faker: For generating test data
-factory_bot_rails: For setting up factories for tests.
-rspec-rails: For writing and running tests.
-shoulda-matchers: For additional matchers to test models.
-rswag: For API documentation and integration testing.
+* rails: The Rails framework for building the application.
+* jwt: For handling JSON Web Tokens (JWT) for authentication.
+* faker: For generating test data
+* factory_bot_rails: For setting up factories for tests.
+* rspec-rails: For writing and running tests.
+* shoulda-matchers: For additional matchers to test models.
+* rswag: For API documentation and integration testing.
 
 **How to Use the Application**
 User Registration
